@@ -1,0 +1,8 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET     /                           controllers.ContactFacade.index
+GET		/contacts					controllers.ContactFacade.list
+GET		/contacts/:id				controllers.ContactFacade.get(id: String)
+POST    /contacts                   controllers.ContactFacade.register(id: String, firstName: String, lastName: String, email: String, phone: String, deleted: Boolean)
