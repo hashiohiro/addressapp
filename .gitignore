@@ -2,3 +2,9 @@ bin
 project/target
 target
 logs
+.cache-main
+.cache-tests
+.classpath
+.project
+.settings/org.eclipse.core.resources.prefs
+.settings/org.scala-ide.sdt.core.prefs
