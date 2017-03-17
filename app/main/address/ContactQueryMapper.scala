@@ -1,24 +1,39 @@
 package main.address
 
-import main.common.PersonName
-import main.common.EmailAddress
-import main.common.PhoneNumber
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import main.common.{ EmailAddress, PersonName, PhoneNumber }
 
 object ContactQueryMapper {
 
   object TableMapping {
-    val id = "ID"
-    val firstName = "FIRST_NAME"
-    val lastName = "LAST_NAME"
-    val email = "EMAIL"
-    val phone = "PHONE"
-    val deleted = "DELETED"
+    private val id = "ID"
+    private val firstName = "FIRST_NAME"
+    private val lastName = "LAST_NAME"
+    private val email = "EMAIL"
+    private val phone = "PHONE"
+    private val deleted = "DELETED"
+    
+    /** 列名と列値のMapからContactオブジェクトを生成します。 */
+    def deserializer(from: Map[String, Any]): Contact = {
+      new Contact(
+        new ContactId(from(TableMapping.id).asInstanceOf[String]),
+        new PersonName(
+          from(TableMapping.firstName).asInstanceOf[String],
+          from(TableMapping.lastName).asInstanceOf[String]  
+        ),
+        new EmailAddress(from(TableMapping.email).asInstanceOf[String]),
+        new PhoneNumber(from(TableMapping.phone).asInstanceOf[String]),
+        from(TableMapping.deleted).asInstanceOf[Boolean]
+      )
+    }
+
+    /** 表形式のデータ構造から、Contactのリストを生成します */
+    def listDeserializer(from: List[Map[String, Any]]): List[Contact] = from.map(deserializer(_))
   }
   
   object JsonMapping {
-    val writes = new Writes[Contact] {
+    private implicit val writes = new Writes[Contact] {
       def writes(contact: Contact) = Json.obj(
         "id" -> contact.id.value,
         "firstName" -> contact.name.firstName,
