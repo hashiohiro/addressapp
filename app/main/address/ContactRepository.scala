@@ -8,6 +8,7 @@ import main.common.PhoneNumber
 import main.infra.DBClient
 import main.infra.DBHelper
 import main.port.repository.Repository
+import main.address.ContactQueryMapper.TableMapping
 
 object ContactRepository extends Repository {
   /** 連絡先をIDで検索します */
@@ -20,7 +21,7 @@ object ContactRepository extends Repository {
     val queryResult = DBClient.query(statement).map(DBHelper.parseQueryResult(_))
 
     queryResult match {
-      case Some(list) => ContactQueryMapper.mapping(list).headOption
+      case Some(list) => ContactQueryMapper.TableMapping.listDeserializer(list).headOption
       case None => None
     }
   }
@@ -33,7 +34,7 @@ object ContactRepository extends Repository {
     val queryResult = DBClient.query(statement).map(DBHelper.parseQueryResult(_))
     
     queryResult match {
-      case Some(list) => ContactQueryMapper.mapping(list)
+      case Some(list) => ContactQueryMapper.TableMapping.listDeserializer(list)
       case None => List()
     }
   }

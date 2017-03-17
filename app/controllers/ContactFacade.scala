@@ -24,7 +24,7 @@ class ContactFacade @Inject() extends Controller {
     val contact = ContactRepository.get(new ContactId(id))
 
     // DBから取得した連絡先をJSONにシリアライズして返す
-    contact.map(ContactQueryMapper.serializeJsonColumn(_)) match {
+    contact.map(c => ContactQueryMapper.JsonMapping.listSerializer(c :: Nil)) match {
       case Some(res)  => Ok(res)
       case None => NotFound
     }
@@ -34,18 +34,12 @@ class ContactFacade @Inject() extends Controller {
   def list = Action {
     val contacts = ContactRepository.list
 
-    val serialize = ContactQueryMapper.serializeJson(contacts)
-    
-    Ok(Json.toJson(serialize))
-
+    Ok(ContactQueryMapper.JsonMapping.listSerializer(contacts))
   }
   
   /** 新しい連絡先を登録します */
   def register(id: String, firstName: String, lastName: String, email: String, phone: String, deleted: Boolean) = Action {
-    //val contact = new Contact(new ContactId(id), new PersonName(firstName, lastName), new EmailAddress(email), new PhoneNumber(phone), deleted)
-
-    //contact.register
-
-    Ok("ok")
+    // TODO: 連絡先の新規登録処理
+    Ok("register contact")
   }
 }
