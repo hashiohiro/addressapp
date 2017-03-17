@@ -1,8 +1,12 @@
-package main.framework
+package main.infra
 
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import scala.collection.mutable.ListBuffer
+import java.sql.Date
+import java.time.LocalDate
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 object DBHelper {
   def bindParams(params: List[Any], statement: PreparedStatement) = {
@@ -10,7 +14,11 @@ object DBHelper {
     val paramsWithIndex = params zip indexes
     paramsWithIndex.foreach {
       case (str: String, index: Int) =>  statement.setString(index, str)
+      case (int: Int, index: Int) => statement.setInt(index, int)
+      case (double: Double, index: Int) => statement.setDouble(index, double)
       case (bool: Boolean, index: Int) => statement.setBoolean(index, bool)
+      case (date: LocalDate, index: Int) => statement.setDate(index, Date.valueOf(date))
+      case (timestamp: LocalDateTime, index: Int) => statement.setTimestamp(index, Timestamp.valueOf(timestamp))
       case (typeValue:Any, index: Int) => throw new PreparedStatementBindParamsException(s"Type: ${ typeValue } Index: ${ index }")
     }
   }

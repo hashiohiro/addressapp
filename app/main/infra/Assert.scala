@@ -1,4 +1,4 @@
-package main.framework
+package main.infra
 
 object Assert {
   def argumentNotEmpty(str: String) {

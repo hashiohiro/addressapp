@@ -1,6 +1,6 @@
 package main.common
 
-import main.framework.Assert
+import main.infra.Assert
 
 class PhoneNumber(val value: String) {
   private val pattern = """(0\d{1,4}-|\(0\d{1,4}\) ?)?\d{1,4}-\d{4}"""

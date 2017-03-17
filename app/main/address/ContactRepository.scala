@@ -5,8 +5,8 @@ import java.sql.Connection
 import main.common.PersonName
 import main.common.EmailAddress
 import main.common.PhoneNumber
-import main.framework.DBClient
-import main.framework.DBHelper
+import main.infra.DBClient
+import main.infra.DBHelper
 import main.port.repository.Repository
 
 object ContactRepository extends Repository {

@@ -1,6 +1,6 @@
 package main.address
 
-import main.framework.Assert
+import main.infra.Assert
 
 class ContactId(val value: String) {
   private val max: Int = 33

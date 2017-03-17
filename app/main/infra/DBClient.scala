@@ -1,4 +1,4 @@
-package main.framework
+package main.infra
 
 import java.sql.Connection
 import java.sql.DriverManager

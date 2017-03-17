@@ -3,7 +3,7 @@ package main.address
 import main.common.PersonName
 import main.common.EmailAddress
 import main.common.PhoneNumber
-import main.framework.Assert
+import main.infra.Assert
 
 class Contact(
   val id: ContactId,
