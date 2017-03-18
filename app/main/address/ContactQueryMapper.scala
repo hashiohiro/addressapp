@@ -6,6 +6,9 @@ import main.common.{ EmailAddress, PersonName, PhoneNumber }
 
 object ContactQueryMapper {
 
+  /**
+   * データベースとオブジェクトのマッピングを提供する。
+   */
   object TableMapping {
     private val id = "ID"
     private val firstName = "FIRST_NAME"
@@ -14,7 +17,7 @@ object ContactQueryMapper {
     private val phone = "PHONE"
     private val deleted = "DELETED"
     
-    /** 列名と列値のMapからContactオブジェクトを生成します。 */
+    /** データベースの行をオブジェクトにデシリアライズする */
     def deserializer(from: Map[String, Any]): Contact = {
       new Contact(
         new ContactId(from(TableMapping.id).asInstanceOf[String]),
@@ -28,7 +31,7 @@ object ContactQueryMapper {
       )
     }
 
-    /** 表形式のデータ構造から、Contactのリストを生成します */
+    /** データベースのテーブルをオブジェクトのリストにデシリアライズする */
     def listDeserializer(from: List[Map[String, Any]]): List[Contact] = from.map(deserializer(_))
   }
   
@@ -52,10 +55,10 @@ object ContactQueryMapper {
       (__ \ "deleted").read[Boolean]
     )(Contact.apply _)
     
-    /** ContactオブジェクトをJsonに変換します */
+    /** オブジェクトをJsonにシリアライズする */
     def serializer(from: Contact) = Json.toJson(from)
     
-    /** ContactのリストをJsonに変換します */
+    /** オブジェクトのリストをJsonにシリアライズする */
     def listSerializer(from: List[Contact]) = {
       // リスト要素を1つずつJsValueに変換し、JsValueのリストを作る
       val jsValueList = from.map(JsonMapping.serializer(_))

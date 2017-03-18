@@ -3,6 +3,9 @@ package main.address
 import main.infra.Assert
 import main.common.AbstractId
 
+/**
+ * 連絡先の識別子
+ */
 class ContactId(override val value: String) extends AbstractId {
   private val max: Int = 33
   private val min: Int = 1
@@ -11,7 +14,7 @@ class ContactId(override val value: String) extends AbstractId {
   // インスタンス化時に単項目チェックを実行する
   validate
   
-  /** 単項目チェック */
+  /** バリデーション */
   override def validate {
     Assert.argumentNotEmpty(value)
     Assert.argumentLength(value, max, min)
