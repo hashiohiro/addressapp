@@ -6,6 +6,9 @@ import java.sql.ResultSet
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
+/**
+ * データベースアクセス処理を提供する
+ */
 object DBClient {
   private val databaseDriver = "org.h2.Driver"
   private val url = "jdbc:h2:~/address"
@@ -26,10 +29,10 @@ object DBClient {
   }
   
   /** コミットします */
-  private def commit = connection.commit
+  def commit = connection.commit
   
   /** ロールバックします */
-  private def rollback = connection.rollback
+  def rollback = connection.rollback
   
   def createStatement(sql: String): PreparedStatement = connection.prepareStatement(sql)
   

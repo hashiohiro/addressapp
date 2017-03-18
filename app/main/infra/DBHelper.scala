@@ -9,6 +9,11 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 
 object DBHelper {
+  /**
+   * PreparedStatementにパラメータをバインドします。
+   * @param params パラメータ
+   * @param statement PreparedStatement
+   */
   def bindParams(params: List[Any], statement: PreparedStatement) = {
     val indexes = 1 to params.length
     val paramsWithIndex = params zip indexes
@@ -23,7 +28,10 @@ object DBHelper {
     }
   }
   
-  /** ResultSetをパースしてMapのList形式で値を返す */
+  /**
+   * ResultSetオブジェクトを走査して表形式のデータ構造を返します。
+   * @param result ResultSet
+   */
   def parseQueryResult(result: ResultSet): List[Map[String, Any]] = {
     val buffer = ListBuffer.empty[Map[String, Any]]
     val columnNum = result.getMetaData.getColumnCount

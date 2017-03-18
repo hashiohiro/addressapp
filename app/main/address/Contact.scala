@@ -1,22 +1,25 @@
 package main.address
 
-import main.common.PersonName
-import main.common.EmailAddress
-import main.common.PhoneNumber
 import main.infra.Assert
+import main.common.{ EmailAddress, PersonName, PhoneNumber, ValueObject }
 
+/**
+ * 連絡先
+ * 
+ * 当オブジェクトバリデーション・新規登録・更新・削除を提供します。
+ */
 class Contact(
   val id: ContactId,
   val name: PersonName,
   val email: EmailAddress,
   val phone: PhoneNumber,
   val deleted: Boolean
-) {
+) extends ValueObject {
   
-  // インスタンス化時に単項目チェックを実行する
+  // インスタンス化時に、当オブジェクト全体のバリデーションを実行する。
   validate
 
-  /** 単項目チェック */
+  /** 当オブジェクト全体のバリデーションを実行します。 */
   def validate {
     Assert.argumentNotEmpty(name.firstName)
     Assert.argumentNotEmpty(name.lastName)

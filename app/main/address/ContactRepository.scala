@@ -1,52 +1,57 @@
 package main.address
 
-import java.sql.DriverManager
-import java.sql.Connection
-import main.common.PersonName
-import main.common.EmailAddress
-import main.common.PhoneNumber
-import main.infra.DBClient
-import main.infra.DBHelper
-import main.port.repository.Repository
+import java.sql.{ Connection, DriverManager }
+import main.infra.{ DBClient, DBHelper }
+import main.port.repository.{ Column, Repository, Table }
+import main.common.{ AbstractId, EmailAddress, PersonName, PhoneNumber, ValueObject }
 import main.address.ContactQueryMapper.TableMapping
+import main.port.repository.{ Condition, LogicalOperator, ComparisonOperator }
 
 object ContactRepository extends Repository {
+
+  /** 当リポジトリが操作の対象とするテーブル */
+  protected override val table = new Table("CONTACT")
+  
+  /** 操作対象テーブルが持つ列一覧 */
+  protected override val columnList = List(
+    new Column("ID"),
+    new Column("FIRST_NAME"),
+    new Column("LAST_NAME"),
+    new Column("EMAIL"),
+    new Column("PHONE"),
+    new Column("DELETED")
+  )
+  
+  
+
+  /** 操作対象テーブルのプライマリキー定義 */
+  protected override val primaryKey = columnList(0)
+  
+  /** 操作対象テーブルの削除フラグ定義 */
+  protected override val deleteFlag = columnList(5)
+
   /** 連絡先をIDで検索します */
-  def get(id: ContactId): Option[Contact] = {
-    val sql = "SELECT * FROM CONTACT WHERE ID = ? AND DELETED = false"
-    val statement = DBClient.createStatement(sql)
-
-    DBHelper.bindParams(List(id.value), statement)
-
-    val queryResult = DBClient.query(statement).map(DBHelper.parseQueryResult(_))
-
-    queryResult match {
-      case Some(list) => ContactQueryMapper.TableMapping.listDeserializer(list).headOption
-      case None => None
-    }
+  def get(id: ContactId): Option[Contact] = super.getGenericData(id) match {
+    case Some(m) => ContactQueryMapper.TableMapping.listDeserializer(m::Nil).headOption
+    case None => None
   }
   
   /** 連絡先の一覧を検索します */
   def list: List[Contact] = {
-    val sql = "SELECT * FROM CONTACT WHERE DELETED = false"
-    val statement = DBClient.createStatement(sql)
+    // 検索条件を構築する
+    val conditions = List(new Condition(new Column("DELETED"), new ComparisonOperator("=")))
+    val logicalOperators = List(new LogicalOperator(""))
     
-    val queryResult = DBClient.query(statement).map(DBHelper.parseQueryResult(_))
+    // 検索処理を実行する
+    val result = super.listGenericData(conditions, logicalOperators)
     
-    queryResult match {
-      case Some(list) => ContactQueryMapper.TableMapping.listDeserializer(list)
-      case None => List()
-    }
+    // 検索結果をContactオブジェクトにマッピングして返す
+    ContactQueryMapper.TableMapping.listDeserializer(result)
   }
 
   /** 連絡先を登録します */
   def insert(contact: Contact): Int = {
-    val sql = """
-                INSERT INTO CONTACT (ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE, DELETED)
-                VALUES (?, ?, ?, ?, ?, ?);
-              """
-    val statement = DBClient.createStatement(sql)
-
+    // PreparedStatementにバインドするパラメータ
     val params = List(
       contact.id.value,
       contact.name.firstName,
@@ -55,58 +60,50 @@ object ContactRepository extends Repository {
       contact.phone.value,
       contact.deleted
     )
-
-    DBHelper.bindParams(params, statement)
-
-    val affectedRowCount = DBClient.update(statement).getOrElse(0)
     
-    affectedRowCount
+    // インサート処理を実行する
+    super.insertGenericData(params)
   }
   
   /** 連絡先を更新します */
   def update(contact: Contact): Int = {
-    val sql = """
-                UPDATE CONTACT SET
-                  FIRST_NAME = ?,
-                  LAST_NAME = ?,
-                  EMAIL = ?,
-                  PHONE = ? 
-                WHERE
-                  ID = ? AND
-                  DELETED = false
-              """
-    val statement = DBClient.createStatement(sql)
-
+    // 更新対象の条件を構築する
+    val conditions = List(new Condition(primaryKey, new ComparisonOperator("=")))
+    val logicalOperators = List(new LogicalOperator(""))
+    
+    // 更新対象の列
+    val columnList = List(
+      new Column("FIRST_NAME"),
+      new Column("LAST_NAME"),
+      new Column("EMAIL"),
+      new Column("PHONE"),
+      new Column("DELETED")
+    )
+    
+    // PreparedStatementにバインドするパラメータ
     val params = List(
       contact.name.firstName,
       contact.name.lastName,
       contact.email.value,
       contact.phone.value,
+      contact.deleted,
       contact.id.value
     )
 
-    DBHelper.bindParams(params, statement)
-
-    val affectedRowCount = DBClient.update(statement).getOrElse(0)
-    
-    affectedRowCount
+    // 更新処理を実行する
+    super.updateGenericData(columnList, params, conditions, logicalOperators)
   }
 
   /** 連絡先を論理削除します */
   def logicalDelete(id: ContactId): Int = {
-    val sql = """
-                UPDATE CONTACT SET
-                  DELETED = true
-                WHERE
-                  ID = ? AND
-                  DELETED = false
-              """
-    val statement = DBClient.createStatement(sql)
-
-    DBHelper.bindParams(List(id.value), statement)
-
-    val affectedRowCount = DBClient.update(statement).getOrElse(0)
-
-    affectedRowCount
+    // 更新対象の条件を構築する
+    val conditions = List(new Condition(primaryKey, new ComparisonOperator("=")))
+    val logicalOperators = List(new LogicalOperator(""))
+    
+    // PreparedStatementにバインドするパラメータ
+    val params = List(id.value)
+    
+    // 更新処理を実行する
+    super.logicalDeleteGenericData(params, conditions, logicalOperators)
   }
 }

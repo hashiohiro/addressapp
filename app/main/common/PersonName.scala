@@ -2,7 +2,14 @@ package main.common
 
 import main.infra.Assert
 
-class PersonName(val firstName: String, val lastName: String) {
+/**
+ * 人名
+ */
+class PersonName(val firstName: String, val lastName: String) extends ValueObject {
+  // インスタンス化時にバリデーションを実行する
+  validate
+
+  /** バリデーション */
   def validate {
   }
 }
