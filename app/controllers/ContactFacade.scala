@@ -1,16 +1,15 @@
 package controllers
 
 import javax.inject._
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import play.api._
 import play.api.mvc._
-import main.address.ContactRepository
-import main.address.ContactId
-import main.address.ContactQueryMapper
 import play.api.libs.json.Json
-import main.common.PhoneNumber
-import main.common.EmailAddress
-import main.common.PersonName
-import main.address.Contact
+import main.infra.JsonObjectMapper
+import main.common.{ EmailAddress, PersonName, PhoneNumber }
+import main.address.{ Contact, ContactId }
+import main.port.repository.h2.H2ContactRepository
 
 @Singleton
 class ContactFacade @Inject() extends Controller {
@@ -21,20 +20,25 @@ class ContactFacade @Inject() extends Controller {
   
   /** 連絡先を1件取得します */
   def get(id: String) = Action {
-    val contact = ContactRepository.get(new ContactId(id))
-
-    // DBから取得した連絡先をJSONにシリアライズして返す
-    contact.map(c => ContactQueryMapper.JsonMapping.listSerializer(c :: Nil)) match {
-      case Some(res)  => Ok(res)
+    // JSONへシリアライズするためのMapを生成する
+    val contact = H2ContactRepository.get(new ContactId(id))
+    val contactMap = contact.map(Contact.toMap(_))
+    
+    // JSONへシリアライズする
+    contactMap.map(JsonObjectMapper.writeValueAsString(_)) match {
+      case Some(res) => Ok(res)
       case None => NotFound
     }
   }
   
   /** 連絡先を一覧で取得します */
   def list = Action {
-    val contacts = ContactRepository.list
+    // JSONへシリアライズするためのMapを生成する
+    val contacts = H2ContactRepository.list
+    val contactsMap = contacts.map(Contact.toMap(_))
 
-    Ok(ContactQueryMapper.JsonMapping.listSerializer(contacts))
+    // JSONへシリアライズする
+    Ok(JsonObjectMapper.writeValueAsString(contactsMap))
   }
   
   /** 新しい連絡先を登録します */
