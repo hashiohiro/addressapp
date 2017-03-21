@@ -1,4 +1,4 @@
-package main.port.repository
+package main.port.repository.common
 
 import main.common.ValueObject
 

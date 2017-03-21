@@ -1,4 +1,4 @@
-package main.port.repository
+package main.port.repository.common
 
 import main.common.ValueObject
 
@@ -8,8 +8,8 @@ class Select(val columnList: List[Column], val table: Table) extends ValueObject
    * SELECT文を取得します。
    */
   def get: String = {
-    val selectColumns = columnList.map(_.get).mkString(",")
-    val tableName = table.get
+    val selectColumns = columnList.map(_.columnName).mkString(",")
+    val tableName = table.name
     
     s"SELECT ${ selectColumns } FROM ${ tableName }"
   }

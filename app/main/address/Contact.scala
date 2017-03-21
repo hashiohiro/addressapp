@@ -2,6 +2,7 @@ package main.address
 
 import main.infra.Assert
 import main.common.{ EmailAddress, PersonName, PhoneNumber, ValueObject }
+import main.port.repository.h2.H2ContactRepository
 
 /**
  * 連絡先
@@ -19,34 +20,64 @@ class Contact(
   // インスタンス化時に、当オブジェクト全体のバリデーションを実行する。
   validate
 
-  /** 当オブジェクト全体のバリデーションを実行します。 */
+  /** 当オブジェクトのバリデーションを実行します。 */
   def validate {
     Assert.argumentNotEmpty(name.firstName)
     Assert.argumentNotEmpty(name.lastName)
     Assert.argumentNotEmpty(email.value)
     Assert.argumentNotEmpty(phone.value)
-    Assert.argumentNotEmpty(name.lastName)
   }
 
   /** 新規登録処理 */
   def register {
-    ContactRepository.insert(this)
+    H2ContactRepository.add(this)
   }
   
   /** 更新処理 */
   def update {
-    ContactRepository.update(this)
   }
   
   /** 削除処理 */
   def delete {
-    ContactRepository.logicalDelete(this.id)
+    H2ContactRepository.remove(this)
   }
 }
 
 object Contact {
-  def apply(id: String, firstName: String, lastName: String, email: String, phone: String, deleted: Boolean): Contact =
-    new Contact(new ContactId(id), new PersonName(firstName, lastName), new EmailAddress(email), new PhoneNumber(phone), deleted)
+  private val id = "ID"
+  private val firstName = "FIRST_NAME"
+  private val lastName = "LAST_NAME"
+  private val email = "EMAIL"
+  private val phone = "PHONE"
+  private val deleted = "DELETED"
 
-  def unapply(contact: Contact) = Option((contact.id, contact.name.firstName, contact.name.lastName, contact.email.value, contact.phone.value, contact.deleted))
+  /**
+   * ContactオブジェクトからMapを生成します。
+   * 
+   * @param contact Contact
+   */
+  def toMap(contact: Contact) = Map(
+    "id" -> contact.id.value,
+    "firstName" -> contact.name.firstName,
+    "lastName" -> contact.name.lastName,
+    "email" -> contact.email.value,
+    "phone" -> contact.phone.value,
+    "deleted" -> contact.deleted
+  )
+  
+  /**
+   * MapからContactオブジェクトを生成します。
+   * 
+   * @param from Map
+   */
+  def fromMap(from: Map[String, Any]) = new Contact(
+    new ContactId(from(id).asInstanceOf[String]),
+    new PersonName(
+      from(firstName).asInstanceOf[String],
+      from(lastName).asInstanceOf[String]  
+    ),
+    new EmailAddress(from(email).asInstanceOf[String]),
+    new PhoneNumber(from(phone).asInstanceOf[String]),
+    from(deleted).asInstanceOf[Boolean]
+  )
 }

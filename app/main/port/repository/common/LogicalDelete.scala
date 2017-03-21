@@ -1,4 +1,4 @@
-package main.port.repository
+package main.port.repository.common
 
 /**
  * 論理削除用のSQL
@@ -8,9 +8,9 @@ class LogicalDelete(table: Table, deleteFlag: Column) {
    * 論理削除用のSQLを取得します。
    */
   def get: String = {
-    val tableName = table.get
+    val tableName = table.name
     
-    val updateColumns = s"${ deleteFlag.get } = true"
+    val updateColumns = s"${ table.deleteFlag.columnName } = true"
     s"UPDATE ${ tableName } SET ${ updateColumns }"
   }
   /**

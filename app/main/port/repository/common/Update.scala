@@ -1,10 +1,10 @@
-package main.port.repository
+package main.port.repository.common
 
 class Update(table: Table, columnList: List[Column]) {
   def get: String = {
-    val tableName = table.get
+    val tableName = table.name
     
-    val updateColumns = columnList.map(column => column.get + " = ?")
+    val updateColumns = columnList.map(column => column.columnName + " = ?")
     s"UPDATE ${ tableName } SET ${ updateColumns.mkString(", ") }"
   }
   

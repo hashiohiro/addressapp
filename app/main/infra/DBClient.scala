@@ -49,7 +49,10 @@ object DBClient {
   /** 更新を実行します */
   def update(statement: PreparedStatement): Option[Int] = {
     try {
-      Some(statement.executeUpdate)
+      statement.executeUpdate match {
+        case cnt if cnt == 0 => None
+        case cnt => Some(cnt)
+      }
     } catch { case e: SQLException =>
       this.rollback
       e.printStackTrace

@@ -2,13 +2,19 @@ package main.port.repository
 
 import main.infra.{ DBClient, DBHelper }
 import main.common.{ AbstractId, ValueObject }
-import main.address.{ Contact, ContactId, ContactRepository, ContactQueryMapper }
+import main.address.{ Contact, ContactId }
+import main.port.repository.common.LogicalDelete
+import main.port.repository.common.Column
+import main.port.repository.common.Condition
+import main.port.repository.common.ComparisonOperator
+import main.port.repository.common.LogicalOperator
+import main.port.repository.common.Insert
+import main.port.repository.common.Update
+import main.port.repository.common.Table
+import main.port.repository.common.Select
 
 trait Repository {
   protected val table: Table
-  protected val columnList: List[Column]
-  protected val primaryKey: Column
-  protected val deleteFlag: Column
 
   /**
    * 主キーを条件としたSELECTを実行します。
@@ -17,16 +23,14 @@ trait Repository {
    */
   protected def getGenericData(id: AbstractId): Option[Map[String, Any]] = {
     // 検索条件リストを作る
-    val conditions = List(
-      new Condition(primaryKey, new ComparisonOperator("=")),
-      new Condition(new Column("DELETED"), new ComparisonOperator("="))
-    ) 
+
+    val conditions = this.primaryKeyCondition ::: List(new Condition(this.table.deleteFlag, new ComparisonOperator("="))) 
     
     // 検索条件リストを演算子で結合する
     val logicalOperators = List(new LogicalOperator("AND"), new LogicalOperator(""))
     
     // PreparedStatementを作成し、パラメータをバインドする
-    val sql = new Select(columnList, table).withCondition(conditions, logicalOperators)
+    val sql = new Select(this.table.unapplySeq.get.toList, table).withCondition(conditions, logicalOperators)
     val statement = DBClient.createStatement(sql)
     DBHelper.bindParams(List(id.value, false), statement)
     
@@ -46,7 +50,7 @@ trait Repository {
   // TODO: 自由度の高い検索ができるようにしよう。
   protected def listGenericData(conditions: List[Condition], logicalOperators: List[LogicalOperator]): List[Map[String, Any]] = {
     // SQLを生成する
-    val sql = new Select(columnList, table).withCondition(conditions, logicalOperators)
+    val sql = new Select(this.table.unapplySeq.get.toList, table).withCondition(conditions, logicalOperators)
     
     // PreparedStatementにパラメータを設定する
     val statement = DBClient.createStatement(sql)
@@ -67,7 +71,7 @@ trait Repository {
    */
   protected def insertGenericData(valueList: List[Any]): Int = {
     // SQLを生成する
-    val sql = new Insert(this.columnList, this.table, valueList).get
+    val sql = new Insert(this.table.unapplySeq.get.toList, this.table, valueList).get
     
     // PreparedStatementにパラメータを設定する
     val statement = DBClient.createStatement(sql)
@@ -145,7 +149,7 @@ trait Repository {
    */
   protected def logicalDeleteGenericData(valueList: List[Any], conditions: List[Condition], logicalOperators: List[LogicalOperator]): Int = {
     // SQLを生成する
-    val sql = new LogicalDelete(this.table, this.deleteFlag).withCondition(conditions, logicalOperators)
+    val sql = new LogicalDelete(this.table, this.table.deleteFlag).withCondition(conditions, logicalOperators)
     
     // PreparedStatementにパラメータをを設定する
     val statement = DBClient.createStatement(sql)
@@ -160,4 +164,9 @@ trait Repository {
       case None => 0
     }
   }
+  
+  /**
+   * 主キー条件を取得します。
+   */
+  protected def primaryKeyCondition: List[Condition] = this.table.primaryKey.map(key => new Condition(key, new ComparisonOperator("=")))
 }
