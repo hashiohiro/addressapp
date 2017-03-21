@@ -10,7 +10,7 @@ class LogicalDelete(table: Table, deleteFlag: Column) {
   def get: String = {
     val tableName = table.name
     
-    val updateColumns = s"${ table.deleteFlag.columnName } = true"
+    val updateColumns = s"${ table.deleteFlag.name } = true"
     s"UPDATE ${ tableName } SET ${ updateColumns }"
   }
   /**

@@ -2,7 +2,7 @@ package main.address
 
 import main.infra.Assert
 import main.common.{ EmailAddress, PersonName, PhoneNumber, ValueObject }
-import main.port.repository.h2.H2ContactRepository
+import main.port.repository.h2_orig.H2ContactRepository
 
 /**
  * 連絡先

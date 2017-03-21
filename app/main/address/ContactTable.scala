@@ -4,12 +4,12 @@ import main.port.repository.common.Table
 import main.port.repository.common.Column
 
 class ContactTable extends Table {
-  val id: Column = new Column("ID", "id")
-  val firstName: Column = new Column("FIRST_NAME", "firstName")
-  val lastName: Column = new Column("LAST_NAME", "lastName")
-  val email: Column = new Column("EMAIL", "email")
-  val phone: Column = new Column("PHONE", "phone")
-  val deleted: Column = new Column("DELETED", "deleted")
+  val id: Column = new Column("ID")
+  val firstName: Column = new Column("FIRST_NAME")
+  val lastName: Column = new Column("LAST_NAME")
+  val email: Column = new Column("EMAIL")
+  val phone: Column = new Column("PHONE")
+  val deleted: Column = new Column("DELETED")
   
   override val name: String = "CONTACT"
   

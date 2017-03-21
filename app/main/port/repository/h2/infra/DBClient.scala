@@ -1,4 +1,4 @@
-package main.infra
+package main.port.repository.h2.infra
 
 import java.sql.Connection
 import java.sql.DriverManager

@@ -1,6 +1,7 @@
 package main.port.repository
 
-import main.infra.{ DBClient, DBHelper }
+import main.infra.{ DBHelper }
+import main.port.repository.h2.infra.DBClient
 import main.common.{ AbstractId, ValueObject }
 import main.address.{ Contact, ContactId }
 import main.port.repository.common.LogicalDelete

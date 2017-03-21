@@ -8,7 +8,7 @@ class Select(val columnList: List[Column], val table: Table) extends ValueObject
    * SELECT文を取得します。
    */
   def get: String = {
-    val selectColumns = columnList.map(_.columnName).mkString(",")
+    val selectColumns = columnList.map(_.name).mkString(",")
     val tableName = table.name
     
     s"SELECT ${ selectColumns } FROM ${ tableName }"

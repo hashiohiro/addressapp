@@ -4,7 +4,7 @@ class Update(table: Table, columnList: List[Column]) {
   def get: String = {
     val tableName = table.name
     
-    val updateColumns = columnList.map(column => column.columnName + " = ?")
+    val updateColumns = columnList.map(column => column.name + " = ?")
     s"UPDATE ${ tableName } SET ${ updateColumns.mkString(", ") }"
   }
   

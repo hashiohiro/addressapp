@@ -1,7 +1,7 @@
 package main.address
 
 trait ContactRepository {
-  def get(id: ContactId): Option[Contact]  
+  def contactOfId(id: ContactId): Option[Contact]  
 
   /** 連絡先の一覧を検索します */
   def list: List[Contact]
