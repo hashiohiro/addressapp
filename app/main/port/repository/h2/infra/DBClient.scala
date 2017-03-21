@@ -15,11 +15,11 @@ object DBClient {
   private val user = "sa"
   private val password = ""
 
-  private lazy val connection: Connection = initializeConnection(url, user, password)
+  private lazy val connection: Connection = initialize(url, user, password)
   
   
   /** DBClientのコネクションを初期化します */
-  private def initializeConnection(url: String, user: String, password: String): Connection = {
+  private def initialize(url: String, user: String, password: String): Connection = {
     Class.forName(databaseDriver)
     val conn = DriverManager.getConnection(url, user, password)
     conn.setAutoCommit(false)

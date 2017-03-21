@@ -9,10 +9,13 @@ import play.api.libs.json.Json
 import main.infra.JsonObjectMapper
 import main.common.{ EmailAddress, PersonName, PhoneNumber }
 import main.address.{ Contact, ContactId }
-import main.port.repository.h2_orig.H2ContactRepository
+import main.port.repository.h2.H2ContactRepository
+import main.port.repository.h2.H2ContactRepository
 
 @Singleton
 class ContactFacade @Inject() extends Controller {
+  // インスタンス化時にリポジトリの初期化を行う
+  val repo = new H2ContactRepository
 
   def index = Action {
     Ok("index")
@@ -21,7 +24,7 @@ class ContactFacade @Inject() extends Controller {
   /** 連絡先を1件取得します */
   def get(id: String) = Action {
     // JSONへシリアライズするためのMapを生成する
-    val contact = H2ContactRepository.contactOfId(new ContactId(id))
+    val contact = repo.contactOfId(new ContactId(id))
     val contactMap = contact.map(Contact.toMap(_))
     
     // JSONへシリアライズする
@@ -34,7 +37,7 @@ class ContactFacade @Inject() extends Controller {
   /** 連絡先を一覧で取得します */
   def list = Action {
     // JSONへシリアライズするためのMapを生成する
-    val contacts = H2ContactRepository.list
+    val contacts = repo.list
     val contactsMap = contacts.map(Contact.toMap(_))
 
     // JSONへシリアライズする

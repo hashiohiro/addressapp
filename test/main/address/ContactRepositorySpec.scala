@@ -11,9 +11,8 @@ class H2ContactRepositorySpec extends PlaySpec {
   
   "H2ContactRepository" should {
     "Contactを1件取得する" in {
-      // データ取得処理を実行する
-      val result = H2ContactRepository.get(new ContactId("874B2A37B9C345E8819116003A81B9AE"))
-
+      val repos = new H2ContactRepository
+      val result = repos.contactOfId(new ContactId("874B2A37B9C345E8819116003A81B9AE"))
       result.map(_.id.value mustBe("874B2A37B9C345E8819116003A81B9AE"))
       result.map(_.name.firstName mustBe("Akira"))
       result.map(_.name.lastName mustBe("Hashimoto"))
@@ -23,14 +22,14 @@ class H2ContactRepositorySpec extends PlaySpec {
     }
     
     "Contactを全件取得する" in {
-      // 一覧取得処理を実行する
-      val result = H2ContactRepository.list
+      val repos = new H2ContactRepository
+      val result = repos.list
       result.length mustBe > (0)
     }
     
     "Contactを新規登録する" in {
-      // 更新処理を実行する
-      val result = H2ContactRepository.add(
+      val repos = new H2ContactRepository
+      val result = repos.add(
         new Contact(
           new ContactId(Identifier.create),
           new PersonName("Hiroshi", "Hashimoto"),
@@ -42,7 +41,7 @@ class H2ContactRepositorySpec extends PlaySpec {
     }
           
     "Contactを論理削除する" in {
-      // テストデータ用の識別子を生成する
+      val repos = new H2ContactRepository
       val identifier = Identifier.create
 
       val contact = new Contact(
@@ -53,10 +52,10 @@ class H2ContactRepositorySpec extends PlaySpec {
         false
       )
       // 論理削除用のデータを作成します
-      val insertResult = H2ContactRepository.add(contact)
+      val insertResult = repos.add(contact)
       
       // 論理削除を実行する
-      H2ContactRepository.remove(contact)
+      repos.remove(contact)
     }
   }
 }

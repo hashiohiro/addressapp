@@ -2,7 +2,7 @@ package main.address
 
 import main.infra.Assert
 import main.common.{ EmailAddress, PersonName, PhoneNumber, ValueObject }
-import main.port.repository.h2_orig.H2ContactRepository
+import main.port.repository.h2.H2ContactRepository
 
 /**
  * 連絡先
@@ -17,7 +17,8 @@ class Contact(
   val deleted: Boolean
 ) extends ValueObject {
   
-  // インスタンス化時に、当オブジェクト全体のバリデーションを実行する。
+  // インスタンス化時にリポジトリの初期化とバリデーションを実行する
+  private val repo = new H2ContactRepository
   validate
 
   /** 当オブジェクトのバリデーションを実行します。 */
@@ -30,7 +31,7 @@ class Contact(
 
   /** 新規登録処理 */
   def register {
-    H2ContactRepository.add(this)
+    repo.add(this)
   }
   
   /** 更新処理 */
@@ -39,7 +40,7 @@ class Contact(
   
   /** 削除処理 */
   def delete {
-    H2ContactRepository.remove(this)
+    repo.remove(this)
   }
 }
 
