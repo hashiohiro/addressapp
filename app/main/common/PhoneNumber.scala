@@ -2,13 +2,16 @@ package main.common
 
 import main.infra.Assert
 
-class PhoneNumber(val value: String) {
+/**
+ * 電話番号
+ */
+class PhoneNumber(val value: String) extends ValueObject {
   private val pattern = """(0\d{1,4}-|\(0\d{1,4}\) ?)?\d{1,4}-\d{4}"""
   
-  // インスタンス化時に単項目チェックを実行する
+  // インスタンス化時にバリデーションを実行する
   validate
 
-  /** 単項目チェック */
+  /** バリデーション */
   def validate {
     Assert.argumentMatch(value, pattern)
   }

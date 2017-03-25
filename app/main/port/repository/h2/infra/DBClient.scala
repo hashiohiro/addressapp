@@ -1,4 +1,4 @@
-package main.infra
+package main.port.repository.h2.infra
 
 import java.sql.Connection
 import java.sql.DriverManager
@@ -6,17 +6,20 @@ import java.sql.ResultSet
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
+/**
+ * データベースアクセス処理を提供する
+ */
 object DBClient {
   private val databaseDriver = "org.h2.Driver"
   private val url = "jdbc:h2:~/address"
   private val user = "sa"
   private val password = ""
 
-  private lazy val connection: Connection = initializeConnection(url, user, password)
+  private lazy val connection: Connection = initialize(url, user, password)
   
   
   /** DBClientのコネクションを初期化します */
-  private def initializeConnection(url: String, user: String, password: String): Connection = {
+  private def initialize(url: String, user: String, password: String): Connection = {
     Class.forName(databaseDriver)
     val conn = DriverManager.getConnection(url, user, password)
     conn.setAutoCommit(false)
@@ -26,10 +29,10 @@ object DBClient {
   }
   
   /** コミットします */
-  private def commit = connection.commit
+  def commit = connection.commit
   
   /** ロールバックします */
-  private def rollback = connection.rollback
+  def rollback = connection.rollback
   
   def createStatement(sql: String): PreparedStatement = connection.prepareStatement(sql)
   
@@ -46,7 +49,10 @@ object DBClient {
   /** 更新を実行します */
   def update(statement: PreparedStatement): Option[Int] = {
     try {
-      Some(statement.executeUpdate)
+      statement.executeUpdate match {
+        case cnt if cnt == 0 => None
+        case cnt => Some(cnt)
+      }
     } catch { case e: SQLException =>
       this.rollback
       e.printStackTrace
